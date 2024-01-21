@@ -21,18 +21,15 @@ from train.state_prediction import MLP
 
 class ArmMotion(Task):
     """
-    Task for learning arm motion to reduce grasp execution time
+    Task for learning arm motion
     """
 
     def __init__(
         self ,
-        gamma=0.95,
-        horizon=100,
-        max_shoulder_pan_turn=np.pi/12,
-        max_shoulder_lift_turn=np.pi/12,
-        max_elbow_turn=np.pi/12
+        cfg
     ) -> None:
 
+        self.cfg = cfg
         self._no_of_ik_solutions = 0
         self._selected_grasp_pose = -1
         self._joint_movements = np.zeros((3,))
@@ -42,14 +39,14 @@ class ArmMotion(Task):
         observation_space = spaces.Box(low=np.array([-3,-3,-3,-1,-1,-1,-1, -2*np.pi, -np.pi, -np.pi, -2*np.pi, -2*np.pi, -2*np.pi]), 
                                         high=np.array([3,3,3,1,1,1,1, 2*np.pi, 0, np.pi, 2*np.pi, 2*np.pi, 2*np.pi]))
         
-        self._max_shoulder_pan_turn = max_shoulder_pan_turn
-        self._max_shoulder_lift_turn = max_shoulder_lift_turn
-        self._max_elbow_turn = max_elbow_turn
+        self._max_shoulder_pan_turn = self.cfg.mdp.max_shoulder_pan_turn
+        self._max_shoulder_lift_turn = self.cfg.mdp.max_shoulder_lift_turn
+        self._max_elbow_turn = self.cfg.mdp.max_elbow_turn
 
         action_space = spaces.Box(low=np.array([-self._max_shoulder_pan_turn, -self._max_shoulder_lift_turn, -self._max_elbow_turn]),
                                   high=np.array([self._max_shoulder_pan_turn, self._max_shoulder_lift_turn, self._max_elbow_turn]))
         
-        mdp_info = MDPInfo(observation_space, action_space, gamma, horizon)
+        mdp_info = MDPInfo(cfg)
 
         self.initialize_mdp(mdp_info)
         self.initialize_parameters()
@@ -59,7 +56,7 @@ class ArmMotion(Task):
 
         # load state predictor
         self.state_predictor = MLP(3,3)
-        self.state_predictor.load_state_dict(torch.load('/media/sdur/Data/RAL/state_prediction/model/current/state_predictor.pt'))
+        self.state_predictor.load_state_dict(torch.load(cfg.train.bp_net))
 
         self.get_arm_joint_angles()
 
@@ -107,9 +104,7 @@ class ArmMotion(Task):
 
     
     def step(self, action):
-        # [dist(base), theta(base), grasp, dont grasp, gp, shoulder_pan, shoulder_lift, elbow]
-
-        # self.world.step(render=True)
+        # [dist(base), theta(base), grasp, dont grasp, shoulder_pan, shoulder_lift, elbow]
         self._no_of_ik_solutions = 0
 
         dist = action[0]
@@ -131,7 +126,7 @@ class ArmMotion(Task):
 
         self._attempt_manipulation = action[2]
 
-        self._state = self._get_state() # after taking the action
+        self._state = self._get_state()
         self._n_steps = self._n_steps + 1
 
         reward, goal_status = self._get_reward()        
@@ -238,20 +233,6 @@ class ArmMotion(Task):
 
         curr_joint_positions = self.get_arm_joint_angles()
 
-        # print("Tool pose:", tool_pose[0])
-
-        # if tool_pose[0][2] < 0.2:
-        #     print("Close to collision with robot base - Terminate!")
-        #     reward = reward - 50000
-        #     goal_status = True
-        #     return reward, goal_status
-
-        # if self.get_euclidean_distance(obj_pose, tool_pose) < 0.10:
-        #     print("Close to collision with object - Terminate!")
-        #     reward = reward - 50000
-        #     goal_status = True
-        #     return reward, goal_status
-
         reward_distance = 5000 * (2.5 - dist_arm_to_obj)/2.5
 
         reward_dist_diff = 1000 * (self._last_dist_arm_to_obj - dist_arm_to_obj)/2.5
@@ -263,6 +244,7 @@ class ArmMotion(Task):
             print("Terminating ....")
 
             reward = self.compute_ik_base_reward(obj_pose, robot_pose, curr_joint_positions, visualize=True) * 100000
+
             # grasp_execution_time =  self.compute_grasp_execution_time(obj_pose, robot_pose, visualize=False)
             # print("Attempting manipulation:", self._n_steps, "Execution time: ", grasp_execution_time)
 
@@ -280,7 +262,6 @@ class ArmMotion(Task):
             if grasp_execution_time > 0:
                 reward = reward + (1000/(grasp_execution_time+1))
 
-        # so 1 episode has max 25 steps
         if self._n_steps > 24:
             goal_status = True
 

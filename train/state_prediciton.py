@@ -16,7 +16,6 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
 
-
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 from torch.utils.data import random_split
@@ -31,6 +30,7 @@ from torch.nn.init import kaiming_uniform_
 from torch.nn.init import xavier_uniform_
 
 device = torch.device("cuda")
+
 
 class StatePredictionDataset(torch.utils.data.Dataset):
   
@@ -120,13 +120,6 @@ class StatePredictionDataset(torch.utils.data.Dataset):
                     self.data_min[i,3:5] = s[0:2]
                     self.data_min[i,5] = Rotation.from_quat(s[3:7]).as_euler('xyz')[2]
 
-
-        # mean = np.mean(self.data[0:7],axis=1)
-        # std = np.std(self.data[0:7],axis=1)
-
-        # print("Max:", np.max(self.data[:,0:7], axis=0))
-        # print("Min:", np.min(self.data[:,0:7], axis=0))
-
         self.data_min[:,0] = self.data_min[:,0]/6.0
         self.data_min[:,1] = self.data_min[:,1]/6.0
         self.data_min[:,2] = self.data_min[:,2]/np.pi
@@ -201,23 +194,21 @@ class StatePredictionDataset(torch.utils.data.Dataset):
         fig.savefig("/media/sdur/Data/RAL/state_prediction/data_vis/{}.png".format(idx))
 
 
-
     def __len__(self):
         return len(self.data_min)
 
+
     def _getitem_full(self, idx):
         return self.data[idx,0:7], self.data[idx,7:14]
-  
+
+
     def __getitem__(self, idx):
-        # return self.data[idx,0:7], self.data[idx,7:14]
-        # print(idx,self.data_min[idx,0:2],  self.data_min[idx,3:5] )
         return self.data_min[idx,0:3], self.data_min[idx,3:6]
 
+
     def get_splits(self, n_test=0.01):
-        # determine sizes
         test_size = round(n_test * len(self.data))
         train_size = len(self.data) - test_size
-        # calculate the split
         return random_split(self, [train_size, test_size])
 
 
@@ -231,22 +222,14 @@ def prepare_data(path, file_name):
 def evaluate_model(test_dl, model):
     predictions, actuals = list(), list()
     for i, (inputs, targets) in enumerate(test_dl, 0):
-        # evaluate the model on the test set
-        inputs, targets = inputs.float(), targets.float() # what about all double
+        inputs, targets = inputs.float(), targets.float()
         
         yhat = model(inputs)
-        # retrieve numpy array
         yhat = yhat.cpu().detach().numpy()
 
         actual = targets.cpu().numpy()
-        # actual = actual.reshape((len(actual), 3))
-        # # round to class values
-        # yhat = yhat.round()
-        # store
         predictions.append(yhat)
         actuals.append(actual)
-    # print("Pred:", predictions[0:5])
-    # print("act:", actuals[0:5])
     predictions, actuals = np.vstack(predictions), np.vstack(actuals)
     print("Predictions:", predictions[0:10])
     print("Actuals:", actuals[0:10])
@@ -255,7 +238,7 @@ def evaluate_model(test_dl, model):
     print("Explained variance score (Best 1.0):", acc)
     return acc
  
-# make a class prediction for one row of data
+
 def predict(row, model):
     # convert row to data
     row = Tensor([row])
@@ -264,6 +247,7 @@ def predict(row, model):
     # retrieve numpy array
     yhat = yhat.detach().numpy()
     return yhat
+
 
 class MLP(Module):
 
@@ -384,7 +368,6 @@ def visualize_predictions(idxs):
         prediction[0] = op[0]*6
         prediction[1] = op[1]*6
         prediction[2] = -0.06038878
-        # prediction[3:7] = Rotation.from_euler('xyz', [-np.pi/2,0,op[2]*np.pi]).as_quat()
         prediction[3:7] = Rotation.from_euler('xyz', [0,0,op[2]*np.pi]).as_quat()
         rpTo = dataset.pose_to_transformation_matrix(prediction)
         rpTo = np.matmul(dataset.rotate_z(np.pi), rpTo)
@@ -422,7 +405,6 @@ def visualize_predictions(idxs):
         fig.savefig("/media/sdur/Data/RAL/state_prediction/predictions_vis/{}.pdf".format(idx), dpi=600, bbox_inches='tight')
 
 if __name__== "__main__":
-    # Set fixed random number seed
     torch.manual_seed(42)
 
     # task = "train"
@@ -437,7 +419,7 @@ if __name__== "__main__":
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     mlp.to(device)
 
-    # prepare dataset
+    # data file
     data_path = '/media/sdur/Data/RAL/task_1/9'
     file_name = 'results_200k.npz'
 
@@ -498,18 +480,13 @@ if __name__== "__main__":
 
         torch.save(mlp.state_dict(), '/media/sdur/Data/RAL/state_prediction/model/state_predictor.pt')
     elif task == "eval":
-        mlp.load_state_dict(torch.load('/media/sdur/Data/RAL/state_prediction/model/state_predictor2000.pt'))
+        mlp.load_state_dict(torch.load('/media/sdur/Data/RAL/state_prediction/model/state_predictor.pt'))
         evaluate_model(dataset_test_dl, mlp)
 
     elif task == "test":
-        # prepare dataset
-        data_path = '/media/sdur/Data/RAL/task_1/0'
-        file_name = 'results200k.npz'
-
         idx = 350
 
         dataset = StatePredictionDataset(data_path, file_name)
-
         mlp.load_state_dict(torch.load('/media/sdur/Data/RAL/state_prediction/model/state_predictor.pt'))
 
         ip = torch.from_numpy(dataset[idx][0]).float()
@@ -518,12 +495,8 @@ if __name__== "__main__":
         print("Actual:", dataset[idx][1][0]*6, dataset[idx][1][1]*6, dataset[idx][1][2]*np.pi)
     
     elif task == "vis_data":
-        # prepare dataset
-        data_path = '/media/sdur/Data/RAL/task_1/0'
-        file_name = 'results200k.npz'
-
         dataset = StatePredictionDataset(data_path, file_name)
-        
+
         dataset.visualize_data(90)
         dataset.visualize_data(178)
         dataset.visualize_data(195)

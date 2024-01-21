@@ -9,36 +9,27 @@ from tqdm import trange
 import hydra
 from omegaconf import DictConfig, OmegaConf
 
-
-
-from base_pose_optimization.tasks.optimize_base_poses import OptimizeBasePoses
-
 from mushroom_rl.algorithms.actor_critic import SAC
 from mushroom_rl.core import Core, Logger
 from mushroom_rl.environments.gym_env import Gym
 from mushroom_rl.utils.dataset import compute_J, parse_dataset
 
 
-from base_pose_optimization.networks.optimize_base_poses_gnn_hetero import ActorNetwork, CriticNetwork
+from pre_grasp_approaching.tasks.base_motion import BaseMotion
 
 
-def experiment(cfg, alg):
+def experiment(cfg):
     np.random.seed()
 
-    logger = Logger(alg.__name__, results_dir=None)
-    logger.strong_line()
-    logger.info('Experiment Algorithm: ' + alg.__name__)
-
     # MDP
-    mdp = OptimizeBasePoses(cfg)
+    mdp = BaseMotion(cfg)
 
     # Info
     print("MDP observation space low:", mdp.info.observation_space.low)
     print("MDP observation space high:", mdp.info.observation_space.high)
 
     # Agent
-    print("Agent location:", '{}/optimize_base_pose_{}_epoch_{}.msh'.format(cfg.task.test.save_dir, alg.__name__, cfg.task.test.epoch_no))
-    agent = alg.load('{}/optimize_base_pose_{}_epoch_{}.msh'.format(cfg.task.test.save_dir, alg.__name__, cfg.task.test.epoch_no))
+    agent = alg.load('{}/{}.msh'.format(cfg.task.test.save_dir, cfg.task.test.agent_name))
 
     # Algorithm
     core = Core(agent, mdp)
@@ -49,11 +40,11 @@ def experiment(cfg, alg):
     print("Done!!")
 
 
-@hydra.main(version_base=None, config_path="../conf", config_name="config")
+@hydra.main(version_base=None, config_path="../conf", config_name="base_motion")
 def main(cfg : DictConfig) -> None:
     config = OmegaConf.to_yaml(cfg)
     print(config)
-    experiment(cfg, alg=SAC)
+    experiment(cfg)
 
 
 if __name__ == '__main__':

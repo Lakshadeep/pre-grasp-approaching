@@ -25,9 +25,11 @@ task:
     n_steps_test: 1500
     save_dir: '/home/sdur/Planning/Data/FCT4/96'
     use_layers: False
+    base_motion_pre_trained_agent_dir: '/home/sdur/Planning/Data/FCT4/54'
+    base_motion_pre_trained_agent_name: 'optimize_base_pose_SAC_epoch_400'
   test:
     save_dir: '/home/sdur/Planning/Data/FCT4/96'
-    agent_name: 'optimize_base_pose_SAC_epoch_400'
+    epoch_no: 40
     n_episodes: 5000
     n_steps: 5000
     save_data: False

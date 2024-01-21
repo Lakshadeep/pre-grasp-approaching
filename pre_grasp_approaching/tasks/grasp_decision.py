@@ -20,6 +20,7 @@ from omni.isaac.core.utils.types import ArticulationAction
 from omni.isaac.manipulators import SingleManipulator
 from omni.isaac.manipulators.grippers import ParallelGripper
 
+
 class GraspDecision(Task):
     """
     Grasp decision
@@ -27,14 +28,10 @@ class GraspDecision(Task):
 
     def __init__(
         self ,
-        gamma=0.95,
-        horizon=100,
-        max_dist=0.1,
-        max_base_turn=np.pi/12,
-        task_no=0
+        cfg
     ) -> None:
 
-        self._task_no = task_no
+        self.cfg = cfg
         self._last_dist_arm_to_obj = 2.5
         self._no_of_ik_solutions = 0
         self._attempt_manipulation = 0
@@ -47,7 +44,7 @@ class GraspDecision(Task):
         self._obj_poses = np.array([])
         self._arm_poses = np.array([])
 
-        super().__init__(gamma, horizon, max_dist, max_base_turn)
+        super().__init__(cfg)
 
 
     
@@ -79,7 +76,6 @@ class GraspDecision(Task):
         return t_error, r_error
 
 
-    
     def step(self, action):
         self._no_of_ik_solutions = 0
 
@@ -91,11 +87,10 @@ class GraspDecision(Task):
         self._state = self._get_state() # after taking the action
         self._n_steps = self._n_steps + 1
 
-        if (self._task_no == 1):
-            self._attempt_manipulation = action[2]
-            if action[2]:
-                self._stopped = 1
-                self._manipulation_attempted = 1
+        self._attempt_manipulation = action[2]
+        if action[2]:
+            self._stopped = 1
+            self._manipulation_attempted = 1
 
         reward, goal_status = self._get_reward()
         return self._state, reward, goal_status, {}
@@ -114,7 +109,7 @@ class GraspDecision(Task):
         rw = 0.5/2
         r = pow(pow(rl,2) + pow(rw,2), 0.5)
         ang = math.atan(rl/rw) 
-        r_off = 0 # np.pi/2
+        r_off = 0
 
         robot_c1 = [robot_pose[0][0] + (r*np.cos(self._wrap_angle(robot_rot_rpy[2] + ang + r_off))), robot_pose[0][1] + (r*np.sin(self._wrap_angle(robot_rot_rpy[2] + ang + r_off))) ]
         robot_c2 = [robot_pose[0][0] + (r*np.cos(self._wrap_angle(robot_rot_rpy[2] - ang + r_off))), robot_pose[0][1] + (r*np.sin(self._wrap_angle(robot_rot_rpy[2] - ang + r_off))) ]
@@ -146,7 +141,7 @@ class GraspDecision(Task):
 
                 if visualize:
                     self.ur5e_sm.set_joint_positions(positions=ik[0][0:6], joint_indices=np.array([0,1,2,3,4,5]))
-                    self.world.step(render=True)
+                    self.world.step(render=self.cfg.mdp.render)
 
         return no_of_ik_solutions
             
@@ -172,7 +167,6 @@ class GraspDecision(Task):
         dist_arm_to_obj = np.sqrt(np.power(object_pose[0][0] - robot_arm_pose[0][0],2) + 
                 np.power(object_pose[0][1] - robot_arm_pose[0][1],2))
 
-
         if self.check_collision():
             reward = reward -50000
             goal_status = True
@@ -183,80 +177,49 @@ class GraspDecision(Task):
             goal_status = True
             return reward, goal_status
 
-
         reward_distance = 5000 * (2.5 - dist_arm_to_obj)/2.5
-
         reward_dist_diff = 1000 * (self._last_dist_arm_to_obj - dist_arm_to_obj)/2.5
         self._last_dist_arm_to_obj = dist_arm_to_obj
-
         reward = reward_distance + reward_dist_diff + reward_time_penalty
 
-        if self._task_no == 1:
-            if self._attempt_manipulation:
-                if dist_arm_to_obj < 0.9:
-                    reward = reward + 1000
 
-                    # self._no_of_ik_solutions = self.get_no_of_ik_solutions_lula(object_pose, robot_arm_pose, visualize=False)
-                    # print("Attempting manipulation:", self._n_steps, "No of IK: ", self._no_of_ik_solutions)
-
-                    # if self._no_of_ik_solutions > 0:
-                    #     reward =  (self._no_of_ik_solutions * 100000) + reward
-                    # else:
-                    #     reward = -0000 + reward
-
-                    grasp_execution_time =  self.compute_grasp_execution_time(object_pose, robot_arm_pose, visualize=True)
-                    print("Attempting manipulation:", self._n_steps, "Execution time: ", grasp_execution_time)
-
-                    if grasp_execution_time > 0:
-                        reward = reward + (100000/(grasp_execution_time+1)) + 50000
-
-                    print("--------------------------------------------------------------------------------------------")
-
-
-
-                else:
-                    reward = -0000 + reward
-                
-                goal_status = True
-            self._no_of_ik_solutions = 0
-        elif self._task_no == 0:
+        if self._attempt_manipulation:
             if dist_arm_to_obj < 0.9:
                 reward = reward + 1000
-                # self._no_of_ik_solutions = self.get_no_of_ik_solutions_lula(object_pose, robot_arm_pose)
-   
+
+                # self._no_of_ik_solutions = self.get_no_of_ik_solutions_lula(object_pose, robot_arm_pose, visualize=False)
+                # print("Attempting manipulation:", self._n_steps, "No of IK: ", self._no_of_ik_solutions)
+
                 # if self._no_of_ik_solutions > 0:
-                #     reward =  (self._no_of_ik_solutions * 100000) + reward 
-                #     goal_status = True
+                #     reward =  (self._no_of_ik_solutions * 100000) + reward
+                # else:
+                #     reward = -0000 + reward
 
                 grasp_execution_time =  self.compute_grasp_execution_time(object_pose, robot_arm_pose, visualize=True)
                 print("Attempting manipulation:", self._n_steps, "Execution time: ", grasp_execution_time)
 
                 if grasp_execution_time > 0:
-                    reward = reward + (100000/(grasp_execution_time + 1)) + 50000
-                
-                    # goal_status = True
+                    reward = reward + (100000/(grasp_execution_time+1)) + 50000
 
+                print("--------------------------------------------------------------------------------------------")
+            
+            goal_status = True
+        
+        self._no_of_ik_solutions = 0
+        
 
-
-        # if dist_base_to_obj < collision_dist:
-        #     reward = reward -100000
-        #     goal_status = True
-
-
-        # so 1 episode has max 25 steps
         if self._n_steps > 24:
             obj_p = self
             self._base_poses = np.append(self._base_poses, self._isaac_pose_to_pose(robot_base_pose))
             self._obj_poses = np.append(self._obj_poses, self._isaac_pose_to_pose(object_pose))
             self._arm_poses = np.append(self._arm_poses, self._isaac_pose_to_pose(robot_arm_pose))
 
-            np.savez('{}/data_for_analysis.npz'.format('/home/sdur/'), full_save=True, 
-                base_poses=self._base_poses, obj_poses=self._obj_poses,
-                arm_poses=self._arm_poses)
+            # np.savez('{}/data_for_analysis.npz'.format('/home/sdur/'), full_save=True, 
+            #     base_poses=self._base_poses, obj_poses=self._obj_poses,
+            #     arm_poses=self._arm_poses)
 
-            if self._task_no == 1:
-                if self._manipulation_attempted == 0:
-                    reward = reward -50000
+            if self._manipulation_attempted == 0:
+                reward = reward -50000
             goal_status = True
 
         return reward, goal_status
