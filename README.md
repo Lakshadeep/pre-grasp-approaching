@@ -1,10 +1,9 @@
 # Pre-grasp approaching
-FacilityCobot T4 Reitnforcement learning solution
 
 # To run
 Go to `/home/sdur/.local/share/ov/pkg/isaac_sim-2022.2.0` and run the following command
 ```
-./python.sh ~/Planning/Codes/base_pose_optimization/{script name}.py 
+./python.sh ~/Planning/Codes/pre-grasp-approaching/{script name}.py 
 
 ```
 
