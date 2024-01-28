@@ -6,10 +6,10 @@ task:
     gamma: 0.95
     horizon: 25
     max_dist: 0.1
-    max_base_turn: 0.26179938779 #pi/12
-    max_shoulder_pan_turn: 0.26179938779 #pi/12
-    max_shoulder_lift_turn: 0.26179938779 #pi/12
-    max_elbow_turn: 0.26179938779 #pi/12
+    max_base_turn: 0.26179938779 # pi/12
+    max_shoulder_pan_turn: 0.26179938779 # pi/12
+    max_shoulder_lift_turn: 0.26179938779 # pi/12
+    max_elbow_turn: 0.26179938779 # pi/12
     render: False
   train:
     initial_replay_size: 3000
@@ -22,19 +22,19 @@ task:
     lr_alpha: 3e-4
     lr_actor: 3e-4
     lr_critic: 3e-4
-    n_epochs: 2001
-    n_steps_train: 4500
+    n_epochs: 150
+    n_steps_train: 3000
     n_steps_test: 1500
-    save_dir: '/home/sdur/Planning/Data/FCT4/96'
+    save_dir: '/home/sdur/Planning/Data/PGA/3'
     use_layers: False
-    bp_net: '/media/sdur/Data/RAL/state_prediction/model/current/state_predictor.pt'
-    base_motion_pre_trained_agent_dir: '/home/sdur/Planning/Data/FCT4/54'
-    base_motion_pre_trained_agent_name: 'optimize_base_pose_SAC_epoch_400'
-    grasp_decision_pre_trained_agent_dir: '/home/sdur/Planning/Data/FCT4/54'
-    grasp_decision_pre_trained_agent_name: 'optimize_base_pose_SAC_epoch_400'
+    bp_net: ''/home/sdur/Planning/Data/PGA/state_prediction/model/state_predictor.pt'
+    base_motion_pre_trained_agent_dir: ''/home/sdur/Planning/Data/PGA/1'
+    base_motion_pre_trained_agent_name: 'base_motion_epoch_100'
+    grasp_decision_pre_trained_agent_dir: ''/home/sdur/Planning/Data/PGA/2''
+    grasp_decision_pre_trained_agent_name: 'grasp_decision_epoch_100'
   test:
-    save_dir: '/home/sdur/Planning/Data/FCT4/96'
-    epoch_no: 40
+    save_dir: ''/home/sdur/Planning/Data/PGA/3''
+    epoch_no: 100
     n_episodes: 5000
     n_steps: 5000
     save_data: False

@@ -190,8 +190,8 @@ class StatePredictionDataset(torch.utils.data.Dataset):
         plt.xlim([-2.5,2.5])
         plt.ylim([-2.5,2.5])
         
-        # plt.show()
-        fig.savefig("/media/sdur/Data/RAL/state_prediction/data_vis/{}.png".format(idx))
+        plt.show()
+        # fig.savefig("/media/sdur/Data/RAL/state_prediction/data_vis/{}.png".format(idx))
 
 
     def __len__(self):
@@ -218,6 +218,7 @@ def prepare_data(path, file_name):
     train_dl = DataLoader(train, batch_size=2048, shuffle=True)
     test_dl = DataLoader(test, batch_size=1024, shuffle=False)
     return train_dl, test_dl
+
 
 def evaluate_model(test_dl, model):
     predictions, actuals = list(), list()
@@ -269,9 +270,7 @@ class MLP(Module):
         kaiming_uniform_(self.hidden5.weight, nonlinearity='relu')
         self.act5 = ReLU()
         self.hidden6 = Linear(128, n_outputs)
-        # kaiming_uniform_(self.hidden6.weight, nonlinearity='relu')
         xavier_uniform_(self.hidden6.weight)
-        # self.act6 = Sigmoid()
 
 
     def forward(self, X):
@@ -291,9 +290,7 @@ class MLP(Module):
         X = self.act5(X)
 
         X = self.hidden6(X)
-        # X = self.act6(X)
         return X
-
 
 
 def visualize_predictions(idxs):
@@ -304,11 +301,11 @@ def visualize_predictions(idxs):
 
     # Initialize the MLP
     mlp = MLP(3,3)
-    mlp.load_state_dict(torch.load('/media/sdur/Data/RAL/state_prediction/model/state_predictor.pt'))
+    mlp.load_state_dict(torch.load('/home/sdur/Planning/Data/PGA/state_prediction/model/state_predictor.pt'))
     mlp.to(torch.device("cuda:0"))
 
     # prepare dataset
-    data_path = '/media/sdur/Data/RAL/task_1/9'
+    data_path = '/home/sdur/Planning/Data/PGA/2/'
     file_name = 'results_200k.npz'
 
     dataset = StatePredictionDataset(data_path, file_name)
@@ -401,14 +398,14 @@ def visualize_predictions(idxs):
         plt.ylim([-2.5,2.5])
         plt.legend(fontsize=15)
         
-        # plt.show()
-        fig.savefig("/media/sdur/Data/RAL/state_prediction/predictions_vis/{}.pdf".format(idx), dpi=600, bbox_inches='tight')
+        plt.show()
+        # fig.savefig("/home/sdur/Planning/Data/PGA/state_prediction/predictions_vis/{}.pdf".format(idx), dpi=600, bbox_inches='tight')
 
 if __name__== "__main__":
     torch.manual_seed(42)
 
-    # task = "train"
-    task = "eval"
+    task = "train"
+    # task = "eval"
     # task = "test"
     # task = "vis_data"
     # task = "vis_pred"
@@ -420,7 +417,7 @@ if __name__== "__main__":
     mlp.to(device)
 
     # data file
-    data_path = '/media/sdur/Data/RAL/task_1/9'
+    data_path = '/home/sdur/Planning/Data/PGA/2/'
     file_name = 'results_200k.npz'
 
     dataset_train_dl, dataset_test_dl = prepare_data(data_path, file_name)
@@ -470,24 +467,24 @@ if __name__== "__main__":
                 #     current_loss = 0.0
             print("Loss after epoch ", epoch, " ", current_loss)
 
-            torch.save(mlp.state_dict(), '/media/sdur/Data/RAL/state_prediction/model/state_predictor.pt')
+            torch.save(mlp.state_dict(), '/home/sdur/Planning/Data/PGA/state_prediction/model/state_predictor.pt')
 
             if epoch % 50 == 0:
-                torch.save(mlp.state_dict(), '/media/sdur/Data/RAL/state_prediction/model/state_predictor{}.pt'.format(epoch))
+                torch.save(mlp.state_dict(), '/home/sdur/Planning/Data/PGA/state_prediction/model/state_predictor.pt'.format(epoch))
 
         # Process is complete.
         print('Training process has finished.')
 
-        torch.save(mlp.state_dict(), '/media/sdur/Data/RAL/state_prediction/model/state_predictor.pt')
+        torch.save(mlp.state_dict(), '/home/sdur/Planning/Data/PGA/state_prediction/model/state_predictor.pt')
     elif task == "eval":
-        mlp.load_state_dict(torch.load('/media/sdur/Data/RAL/state_prediction/model/state_predictor.pt'))
+        mlp.load_state_dict(torch.load('/home/sdur/Planning/Data/PGA/state_prediction/model/state_predictor.pt'))
         evaluate_model(dataset_test_dl, mlp)
 
     elif task == "test":
         idx = 350
 
         dataset = StatePredictionDataset(data_path, file_name)
-        mlp.load_state_dict(torch.load('/media/sdur/Data/RAL/state_prediction/model/state_predictor.pt'))
+        mlp.load_state_dict(torch.load('/home/sdur/Planning/Data/PGA/state_prediction/model/state_predictor.pt'))
 
         ip = torch.from_numpy(dataset[idx][0]).float()
         op = mlp.forward(ip)

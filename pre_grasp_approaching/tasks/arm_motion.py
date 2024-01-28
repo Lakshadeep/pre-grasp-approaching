@@ -233,34 +233,26 @@ class ArmMotion(Task):
 
         curr_joint_positions = self.get_arm_joint_angles()
 
-        reward_distance = 5000 * (2.5 - dist_arm_to_obj)/2.5
-
-        reward_dist_diff = 1000 * (self._last_dist_arm_to_obj - dist_arm_to_obj)/2.5
-        self._last_dist_arm_to_obj = dist_arm_to_obj
-
         navigation_time = self._n_steps
 
+        if tool_pose[0][2] < 0.1:
+            print("Close to collision with robot base - Terminate!")
+            reward = reward - 50000
+            goal_status = True
+            return reward, goal_status
+
+        if self.get_euclidean_distance(obj_pose, tool_pose) < 0.10:
+            print("Close to collision with object - Terminate!")
+            reward = reward - 50000
+            goal_status = True
+            return reward, goal_status
+
         if self._attempt_manipulation:
-            print("Terminating ....")
-
-            reward = self.compute_ik_base_reward(obj_pose, robot_pose, curr_joint_positions, visualize=True) * 100000
-
-            # grasp_execution_time =  self.compute_grasp_execution_time(obj_pose, robot_pose, visualize=False)
-            # print("Attempting manipulation:", self._n_steps, "Execution time: ", grasp_execution_time)
-
-            self.curr_grasp_exec_time =  0 #grasp_execution_time
-
-            # if grasp_execution_time > 0:
-            #     reward = reward + (100000/(grasp_execution_time+1)) + 0000
-
+            reward = self.compute_ik_base_reward(obj_pose, robot_pose, curr_joint_positions, visualize=True) * 500000
             goal_status = True
         else:
             pred_robot_pose = self._pose_to_isaac_pose(self._get_predicted_terminal_state(self._state))
             reward = self.compute_ik_base_reward(obj_pose, pred_robot_pose, curr_joint_positions) * 50000
-
-            grasp_execution_time =  self.compute_grasp_execution_time(obj_pose, pred_robot_pose, visualize=False)
-            if grasp_execution_time > 0:
-                reward = reward + (1000/(grasp_execution_time+1))
 
         if self._n_steps > 24:
             goal_status = True

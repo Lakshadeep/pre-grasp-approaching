@@ -37,8 +37,15 @@ def experiment(cfg):
     # Algorithm
     core = Core(agent, mdp)
 
-    core.evaluate(n_episodes=cfg.task.test.n_episodes, render=False)
-    # core.evaluate(n_steps=cfg.test.n_steps, render=False)
+    dataset = core.evaluate(n_episodes=cfg.task.test.n_episodes, render=False)
+    
+    # save data for training BP-Net
+    state, action, reward, next_state, absorbing, last = parse_dataset(dataset)
+
+    np.savez('{}/results_200k.npz'.format(cfg.task.test.save_dir), full_save=True, 
+        state=state, action=action, reward=reward, next_state=next_state, 
+        absorbing=absorbing, last=last)
+
 
     print("Done!!")
 

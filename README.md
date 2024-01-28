@@ -40,3 +40,27 @@ Layer 1: base motion
 ./python.sh {package path}/pre-grasp-approaching/train/base_motion.py 
 
 ```
+
+Layer 2: grasp decision
+```
+./python.sh {package path}/pre-grasp-approaching/train/grasp_decision.py 
+
+```
+
+BP-Net
+
+First, save data for training BP-Net 
+```
+./python.sh {package path}/pre-grasp-approaching/test/grasp_decision.py 
+```
+Then use this data to train BP-Net
+```
+./python.sh {package path}/pre-grasp-approaching/train/state_prediction.py 
+```
+
+
+Layer 3: arm motion
+```
+./python.sh {package path}/pre-grasp-approaching/train/arm_motion.py 
+
+```

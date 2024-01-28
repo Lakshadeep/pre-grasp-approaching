@@ -12,7 +12,7 @@ import hydra
 from omegaconf import DictConfig, OmegaConf
 import os
 
-from mushroom_rl.algorithms.actor_critic import SAC, DDPG, SAC_hybrid, GaRrHyRL, BHyRL, PPO
+from mushroom_rl.algorithms.actor_critic import SAC, DDPG, LRL, PPO
 from mushroom_rl.core import Core, Logger
 from mushroom_rl.environments.gym_env import Gym
 from mushroom_rl.utils.dataset import compute_J, parse_dataset
@@ -91,7 +91,6 @@ def experiment(cfg, alg):
     agent = alg(mdp.info, [4,7], actor_mu_params, actor_sigma_params, None, actor_optimizer, critic_params, batch_size, 
         initial_replay_size, max_replay_size, warmup_transitions, tau, lr_alpha, critic_fit_params=None)
 
-    # Should be 0 to 7 states for ours
     agent.setup_prior([base_motion_agent, arm_motion_agent], np.array([[0,7],[0,7]]), np.array([[0,2],[2,4]]))
     core = Core(agent, mdp)
 
@@ -135,7 +134,7 @@ def experiment(cfg, alg):
         save_dir = cfg.task.train.save_dir
         if save_dir:
             if n % 10  == 0:
-                agent.save('{}/grasp_decision_epoch_{}.msh'.format(save_dir, n), full_save=True)
+                agent.save('{}/arm_motion_epoch_{}.msh'.format(save_dir, n), full_save=True)
             
             J_mean_logs[n] = J_mean
             J_var_logs[n] = J_var
@@ -143,18 +142,18 @@ def experiment(cfg, alg):
             R_var_logs[n] = R_var
             E_logs[n] = E
 
-        np.savez('{}/grasp_decision_data_logs.npz'.format(save_dir), full_save=True, J=J_mean_logs, 
+        np.savez('{}/arm_motion_data_logs.npz'.format(save_dir), full_save=True, J=J_mean_logs, 
             R=R_mean_logs, E=E_logs, J_var=J_var_logs, R_var=R_var_logs)
 
     print("Training done")
     mdp.shutdown()
 
 
-@hydra.main(version_base=None, config_path="../conf", config_name="grasp_decision")
+@hydra.main(version_base=None, config_path="../conf", config_name="arm_motion")
 def main(cfg : DictConfig) -> None:
     config = OmegaConf.to_yaml(cfg)
     print(config)
-    experiment(cfg, alg=SAC)
+    experiment(cfg, alg=LRL)
 
 
 if __name__ == '__main__':
