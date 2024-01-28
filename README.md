@@ -1,26 +1,35 @@
 # Pre-grasp approaching
 
-# To run
-Go to `/home/sdur/.local/share/ov/pkg/isaac_sim-2022.2.0` and run the following command
-```
-./python.sh ~/Planning/Codes/pre-grasp-approaching/{script name}.py 
+Code repository for our paper "Pre-grasp approaching on mobile robots: a pre-active layered approach" by Lakshadeep Naik, Sinan Kalkan and Norbert Kruger. 
 
-```
 
-# Notes
+# Pre-requisites
+Our code uses NVIDIA Isaac Sim for simulation. Installation instructions can be found [here](https://docs.omniverse.nvidia.com/isaacsim/latest/installation/install_workstation.html). This code has been tested with Isaac Sim version 'isaac_sim-2022.2.0'
 
-## Installing new packages in Isaac
+Further, following python packages should be installed in the Isaac sim python environment:
 ```
-./python.sh -m pip install {name of the package}  --global-option=build_ext --global-option=build_ext  --global-option="-I/home/sdur/.local/share/ov/pkg/isaac_sim-2022.1.1/kit/python/include/python3.7m"
+omegaconf, hydra, hydra-core, tqdm, opencv-python, networkx, karateclub, mushroom-rl (local), shapely, torch-scatter (build),  torch-sparse (build), torch-cluster (build), torch-spline-conv (build), torch-geometric (build)
 ```
 
-#### Installing this package in Isaac
+'local' - local installation of the package is required
+'build' - depending on the CUDA version and other driver installations on your system you might need to build the package locally.
+
+#### Installing new python packages in Isaac
 ```
-./python.sh -m pip install -e ~/Planning/Codes/base_pose_optimization/  --global-option=build_ext --global-option=build_ext  --global-option="-I/home/sdur/.local/share/ov/pkg/isaac_sim-2022.1.1/kit/python/include/python3.7m"
+./python.sh -m pip install {name of the package}  --global-option=build_ext --global-option=build_ext  --global-option="-I{Isaac install path}/ov/pkg/isaac_sim-2022.2.0/kit/python/include/python3.7m"
 ```
 
-#### Dependencies
-omegaconf, hydra, hydra-core, tqdm, opencv-python, networkx, karateclub, mushroom-rl (local), ikfastpy (local), shapely, torch-scatter (build),  torch-sparse (build), torch-cluster (build), torch-spline-conv (build), torch-geometric (build)
+#### Installing local python package in Isaac (for mushoorm-rl and this package)
+```
+./python.sh -m pip install -e {package path}/  --global-option=build_ext --global-option=build_ext  --global-option="-I{Isaac install pathj}/ov/pkg/isaac_sim-2022.2.0/kit/python/include/python3.7m"
+```
 
-Use Isaac 2.0.0 for this package on FacilityCobot workstation.
-https://github.com/mberr/pytorch-geometric-installer
+## NOTES:
+- Before trying to run the code, please change relative paths in all th config files in 'conf' folder.
+
+# To run the scripts
+First open `{Isaac install path}/ov/pkg/isaac_sim-2022.2.0` in terminal and run the following command:
+```
+./python.sh {package path}/{script name}.py 
+
+```
