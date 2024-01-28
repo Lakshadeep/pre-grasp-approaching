@@ -8,11 +8,11 @@ Our code uses NVIDIA Isaac Sim for simulation. Installation instructions can be 
 
 Further, following python packages should be installed in the Isaac sim python environment:
 ```
-omegaconf, hydra, hydra-core, tqdm, opencv-python, networkx, karateclub, mushroom-rl (local), shapely, torch-scatter (build),  torch-sparse (build), torch-cluster (build), torch-spline-conv (build), torch-geometric (build)
+omegaconf, hydra, hydra-core, tqdm, opencv-python,  mushroom-rl (local), shapely
 ```
 
 'local' - local installation of the package is required
-'build' - depending on the CUDA version and other driver installations on your system you might need to build the package locally.
+
 
 #### Installing new python packages in Isaac
 ```

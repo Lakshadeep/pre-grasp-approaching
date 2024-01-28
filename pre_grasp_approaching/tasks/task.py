@@ -491,7 +491,7 @@ class Task(Environment):
         assets_root_path = get_assets_root_path()
 
         # TODO: make this path relative
-        scene_path = "/home/sdur/Planning/Codes/pre-grasp-approaching/isaac_envs/task.usd"
+        scene_path = self.cfg.env_file
         
         open_stage(usd_path=scene_path)
 
@@ -560,16 +560,16 @@ class Task(Environment):
 
         # Lula Kinematics solver
         self.lula_kinematics_solver = LulaKinematicsSolver(
-            robot_description_path = '/home/sdur/Planning/Codes/pre-grasp-approaching/ur5e_assets/robot_descriptor_basic.yaml',
-            urdf_path = '/home/sdur/Planning/Codes/pre-grasp-approaching/ur5e_assets/ur5e_gripper.urdf'
+            robot_description_path = self.cfg.robot_description_file,
+            urdf_path = self.cfg.urdf_file
         )
 
         self.articulation_kinematics_solver = ArticulationKinematicsSolver(self.robot, self.lula_kinematics_solver, "tool0")
 
         # Initialize a LulaCSpaceTrajectoryGenerator object
         self.task_space_trajectory_generator = LulaTaskSpaceTrajectoryGenerator(
-            robot_description_path = '/home/sdur/Planning/Codes/pre-grasp-approaching/ur5e_assets/robot_descriptor_basic.yaml',
-            urdf_path = '/home/sdur/Planning/Codes/pre-grasp-approaching/ur5e_assets/ur5e_gripper.urdf'
+            robot_description_path = self.cfg.robot_description_file,
+            urdf_path = self.cfg.urdf_file
         )
 
         # start simulation

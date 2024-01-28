@@ -1,5 +1,7 @@
 task:
-  env_file: "/home/sdur/Planning/Codes/pre-grasp-approaching/isaac_envs/task.usd"  
+  env_file: "/home/sdur/Planning/Codes/pre-grasp-approaching/isaac_envs/task.usd"
+  robot_description_file: "/home/sdur/Planning/Codes/pre-grasp-approaching/ur5e_assets/robot_descriptor_basic.yaml"
+  urdf_file: "/home/sdur/Planning/Codes/pre-grasp-approaching/ur5e_assets/ur5e_gripper.urdf"
   mdp:
     gamma: 0.95
     horizon: 25
