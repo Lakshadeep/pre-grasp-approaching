@@ -34,8 +34,7 @@ def experiment(cfg):
     # Algorithm
     core = Core(agent, mdp)
 
-    core.evaluate(n_episodes=cfg.task.test.n_episodes, render=False)
-    # core.evaluate(n_steps=cfg.test.n_steps, render=False)
+    core.evaluate(n_episodes=cfg.task.test.n_episodes, render=cfg.task.mdp.render)
 
     print("Done!!")
 

@@ -12,9 +12,9 @@ from omni.isaac.kit import SimulationApp
 from pxr import UsdLux, UsdGeom, Sdf, Gf, UsdPhysics
 from omni.isaac.core.prims import XFormPrim
 from omni.isaac.motion_generation import LulaKinematicsSolver, ArticulationKinematicsSolver
-from omni.isaac.motion_generation import ArticulationTrajectory # not available in old isaac 1.1
+from omni.isaac.motion_generation import ArticulationTrajectory # not available in old Isaac 1.1
 from omni.isaac.motion_generation.lula import RmpFlow
-from omni.isaac.motion_generation.lula import LulaTaskSpaceTrajectoryGenerator # not available in old isaac
+from omni.isaac.motion_generation.lula import LulaTaskSpaceTrajectoryGenerator # not available in old Isaac 1.1
 from omni.isaac.motion_generation import ArticulationMotionPolicy
 from omni.isaac.core.utils.types import ArticulationAction
 from omni.isaac.manipulators import SingleManipulator
@@ -51,7 +51,6 @@ class BaseMotion(Task):
         self._last_dist_arm_to_obj = 2.5
         self._no_of_ik_solutions = 0
 
-        self._manipulation_attempted = 0
         self._selected_grasp_pose = np.zeros((2,))
         self._stopped = 0
 
@@ -162,40 +161,26 @@ class BaseMotion(Task):
 
 
         if self.check_collision():
-            reward = reward -50000
-            goal_status = True
-            return reward, goal_status
-
-        if dist_arm_to_obj > 3.0:
-            reward = reward -50000
+            reward = reward -100000
             goal_status = True
             return reward, goal_status
 
 
-        reward_distance = 5000 * (2.5 - dist_arm_to_obj)/2.5
+        reward = reward_time_penalty
 
-        reward_dist_diff = 1000 * (self._last_dist_arm_to_obj - dist_arm_to_obj)/2.5
-        self._last_dist_arm_to_obj = dist_arm_to_obj
-
-        reward = reward_distance + reward_dist_diff + reward_time_penalty
-
-        if dist_arm_to_obj < 0.9:
-            reward = reward + 1000
-
-            grasp_execution_time =  self.compute_grasp_execution_time(object_pose, robot_arm_pose, visualize=True)
-            print("Attempting manipulation:", self._n_steps, "Execution time: ", grasp_execution_time)
-
-            if grasp_execution_time > 0:
-                reward = reward + (100000/(grasp_execution_time + 1)) + 50000
-            
+        self._no_of_ik_solutions = self.get_no_of_ik_solutions_lula(object_pose, robot_arm_pose, visualize=False)
+                    
+        if self._no_of_ik_solutions > 0:
+            reward =  (self._no_of_ik_solutions * 100000) + reward
+                            
 
         if self._n_steps > 24:
-            obj_p = self
-            self._base_poses = np.append(self._base_poses, self._isaac_pose_to_pose(robot_base_pose))
-            self._obj_poses = np.append(self._obj_poses, self._isaac_pose_to_pose(object_pose))
-            self._arm_poses = np.append(self._arm_poses, self._isaac_pose_to_pose(robot_arm_pose))
-
             # save data for analysis
+
+            # self._base_poses = np.append(self._base_poses, self._isaac_pose_to_pose(robot_base_pose))
+            # self._obj_poses = np.append(self._obj_poses, self._isaac_pose_to_pose(object_pose))
+            # self._arm_poses = np.append(self._arm_poses, self._isaac_pose_to_pose(robot_arm_pose))
+
             # np.savez('{}/data_for_analysis.npz'.format('/home/sdur/'), full_save=True, 
             #     base_poses=self._base_poses, obj_poses=self._obj_poses,
             #     arm_poses=self._arm_poses)

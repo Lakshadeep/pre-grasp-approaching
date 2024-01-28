@@ -25,11 +25,18 @@ omegaconf, hydra, hydra-core, tqdm, opencv-python, networkx, karateclub, mushroo
 ```
 
 ## NOTES:
-- Before trying to run the code, please change relative paths in all th config files in 'conf' folder.
+- Before trying to run the code, please change relative paths in all the config files in 'conf' folder.
 
 # To run the scripts
 First open `{Isaac install path}/ov/pkg/isaac_sim-2022.2.0` in terminal and run the following command:
 ```
 ./python.sh {package path}/{script name}.py 
+
+```
+
+# Training
+Layer 1: base motion
+```
+./python.sh {package path}/pre-grasp-approaching/train/base_motion.py 
 
 ```
