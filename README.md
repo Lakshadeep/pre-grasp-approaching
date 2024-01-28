@@ -3,6 +3,8 @@
 Code repository for our paper "Pre-grasp approaching on mobile robots: a pre-active layered approach" by Lakshadeep Naik, Sinan Kalkan and Norbert Kruger. 
 
 [Paper pre-print](https://portal.findresearcher.sdu.dk/files/253491726/RAL24-pre-grasp-approaching.pdf)
+[Project webpage](https://lakshadeep.github.io/pgamr/)
+[Supplementary video](https://www.youtube.com/watch?v=e1W-owaG_I4)
 
 # Pre-requisites
 Our code uses NVIDIA Isaac Sim for simulation. Installation instructions can be found [here](https://docs.omniverse.nvidia.com/isaacsim/latest/installation/install_workstation.html). This code has been tested with Isaac Sim version 'isaac_sim-2022.2.0'
