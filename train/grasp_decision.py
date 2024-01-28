@@ -12,7 +12,7 @@ import hydra
 from omegaconf import DictConfig, OmegaConf
 import os
 
-from mushroom_rl.algorithms.actor_critic import SAC, DDPG, SAC_hybrid, GaRrHyRL, BHyRL, PPO
+from mushroom_rl.algorithms.actor_critic import SAC, DDPG, SAC_hybrid, LRL, PPO
 from mushroom_rl.core import Core, Logger
 from mushroom_rl.environments.gym_env import Gym
 from mushroom_rl.utils.dataset import compute_J, parse_dataset
@@ -147,7 +147,7 @@ def experiment(cfg, alg):
 def main(cfg : DictConfig) -> None:
     config = OmegaConf.to_yaml(cfg)
     print(config)
-    experiment(cfg, alg=SAC)
+    experiment(cfg, alg=LRL)
 
 
 if __name__ == '__main__':

@@ -6,10 +6,10 @@ task:
     gamma: 0.95
     horizon: 25
     max_dist: 0.1
-    max_base_turn: 0.26179938779 #pi/12
-    max_shoulder_pan_turn: 0.26179938779 #pi/12
-    max_shoulder_lift_turn: 0.26179938779 #pi/12
-    max_elbow_turn: 0.26179938779 #pi/12
+    max_base_turn: 0.26179938779 # pi/12
+    max_shoulder_pan_turn: 0.26179938779 # pi/12
+    max_shoulder_lift_turn: 0.26179938779 # pi/12
+    max_elbow_turn: 0.26179938779 # pi/12
     render: False
   train:
     initial_replay_size: 3000
@@ -25,12 +25,12 @@ task:
     n_epochs: 2001
     n_steps_train: 4500
     n_steps_test: 1500
-    save_dir: '/home/sdur/Planning/Data/FCT4/96'
+    save_dir: '/home/sdur/Planning/Data/PGA/2'
     use_layers: False
-    base_motion_pre_trained_agent_dir: '/home/sdur/Planning/Data/FCT4/54'
-    base_motion_pre_trained_agent_name: 'optimize_base_pose_SAC_epoch_400'
+    base_motion_pre_trained_agent_dir: '/home/sdur/Planning/Data/PGA/1'
+    base_motion_pre_trained_agent_name: 'base_motion_epoch_100'
   test:
-    save_dir: '/home/sdur/Planning/Data/FCT4/96'
+    save_dir: '/home/sdur/Planning/Data/PGA/2'
     epoch_no: 40
     n_episodes: 5000
     n_steps: 5000
