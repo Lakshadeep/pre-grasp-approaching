@@ -1,6 +1,6 @@
 # Pre-grasp approaching
 
-Code repository for our paper "Pre-grasp approaching on mobile robots: a pre-active layered approach" by Lakshadeep Naik, Sinan Kalkan and Norbert Kruger. 
+Code repository for our paper "Pre-grasp approaching on mobile robots: a pre-active layered approach" by Lakshadeep Naik, Sinan Kalkan and Norbert Kruger published in IEEE Robotics and Automation Letters (RA-L) 
 
 [Paper pre-print](https://portal.findresearcher.sdu.dk/files/253491726/RAL24-pre-grasp-approaching.pdf)
 [Project webpage](https://lakshadeep.github.io/pgamr/)
@@ -68,7 +68,7 @@ Layer 3: arm motion
 
 ```
 
-## If you found our work useful, consider citing out paper:
+## If you found our work useful, consider citing our paper:
 
 Naik, L., Kalkan, S., & Krüger, N. (2024). Pre-grasp approaching on mobile robots: a pre-active layered approach. IEEE Robotics and Automation Letters.
 
