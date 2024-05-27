@@ -11,9 +11,7 @@ pre-grasp-approaching.egg-info/
 *.so
 *.thumbs
 *.stl
-*.png
 *.dae
 *.launch
 *.xacro
-*ur_description*
 *.egg-info
