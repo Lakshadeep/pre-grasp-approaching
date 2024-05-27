@@ -1,6 +1,6 @@
 from pre_grasp_approaching.tasks.task import Task
 
-import ikfastpy
+# import ikfastpy
 import numpy as np
 import datetime
 import math
