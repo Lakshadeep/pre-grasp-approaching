@@ -1,4 +1,4 @@
-from motion_planning.tasks.task import Task
+from pre_grasp_approaching.tasks.task import Task
 
 # import ikfastpy
 import numpy as np
