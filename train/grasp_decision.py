@@ -64,7 +64,7 @@ def experiment(cfg, alg):
     actor_optimizer = {'class': optim.Adam,
                        'params': {'lr': lr_actor}}
 
-    critic_input_shape = (actor_input_shape[0] + mdp.info.action_space.shape[0] + action_space_discrete[0],) 
+    critic_input_shape = (actor_input_shape[0] + mdp.info.action_space.shape[0] + action_space_continous[0],) 
 
     critic_params = dict(network=CriticNetwork,
                          optimizer={'class': optim.Adam,
