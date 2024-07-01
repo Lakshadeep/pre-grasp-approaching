@@ -27,13 +27,13 @@ task:
     n_steps_test: 1500
     save_dir: '/home/sdur/Planning/Data/PGA/3'
     use_layers: False
-    bp_net: ''/home/sdur/Planning/Data/PGA/state_prediction/model/state_predictor.pt'
-    base_motion_pre_trained_agent_dir: ''/home/sdur/Planning/Data/PGA/1'
+    bp_net: '/home/sdur/Planning/Data/PGA/state_prediction/model/state_predictor.pt'
+    base_motion_pre_trained_agent_dir: '/home/sdur/Planning/Data/PGA/1'
     base_motion_pre_trained_agent_name: 'base_motion_epoch_100'
-    grasp_decision_pre_trained_agent_dir: ''/home/sdur/Planning/Data/PGA/2''
+    grasp_decision_pre_trained_agent_dir: '/home/sdur/Planning/Data/PGA/2'
     grasp_decision_pre_trained_agent_name: 'grasp_decision_epoch_100'
   test:
-    save_dir: ''/home/sdur/Planning/Data/PGA/3''
+    save_dir: '/home/sdur/Planning/Data/PGA/3'
     epoch_no: 100
     n_episodes: 5000
     n_steps: 5000

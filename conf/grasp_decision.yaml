@@ -31,8 +31,9 @@ task:
     base_motion_pre_trained_agent_name: 'base_motion_epoch_100'
   test:
     save_dir: '/home/sdur/Planning/Data/PGA/2'
-    epoch_no: 40
+    epoch_no: 0
     n_episodes: 5000
     n_steps: 5000
     save_data: False
+    agent_name: 'grasp_decision_epoch_100'
 

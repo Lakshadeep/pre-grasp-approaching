@@ -103,7 +103,7 @@ def experiment(cfg, alg):
     J_mean = np.mean(compute_J(dataset, mdp.info.gamma))
     R_mean = np.mean(compute_J(dataset))
 
-    E = agent.policy.entropy(s)
+    E = agent.policy.entropy(np.hstack((s,a[:,0:4])))
 
     logger.epoch_info(0, J=J_mean, R=R_mean, entropy=E)
 
@@ -127,13 +127,13 @@ def experiment(cfg, alg):
         R_mean = np.mean(compute_J(dataset))
         R_var = np.var(compute_J(dataset))
 
-        E = agent.policy.entropy(s)
+        E = agent.policy.entropy(np.hstack((s,a[:,0:4])))
 
         logger.epoch_info(n+1, J=J_mean, R=R_mean, entropy=E)
 
         save_dir = cfg.task.train.save_dir
         if save_dir:
-            if n % 10  == 0:
+            if n % 1  == 0:
                 agent.save('{}/arm_motion_epoch_{}.msh'.format(save_dir, n), full_save=True)
             
             J_mean_logs[n] = J_mean

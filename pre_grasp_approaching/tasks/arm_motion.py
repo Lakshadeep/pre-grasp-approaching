@@ -46,7 +46,7 @@ class ArmMotion(Task):
         action_space = spaces.Box(low=np.array([-self._max_shoulder_pan_turn, -self._max_shoulder_lift_turn, -self._max_elbow_turn]),
                                   high=np.array([self._max_shoulder_pan_turn, self._max_shoulder_lift_turn, self._max_elbow_turn]))
         
-        mdp_info = MDPInfo(cfg)
+        mdp_info = MDPInfo(observation_space,action_space,cfg.mdp.gamma,cfg.mdp.horizon)
 
         self.initialize_mdp(mdp_info)
         self.initialize_parameters()
