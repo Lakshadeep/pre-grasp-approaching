@@ -9,7 +9,7 @@ from tqdm import trange
 import hydra
 from omegaconf import DictConfig, OmegaConf
 
-from mushroom_rl.algorithms.actor_critic import SAC
+from mushroom_rl.algorithms.actor_critic import SAC, DDPG, LRL, PPO
 from mushroom_rl.core import Core, Logger
 from mushroom_rl.environments.gym_env import Gym
 from mushroom_rl.utils.dataset import compute_J, parse_dataset
@@ -18,11 +18,11 @@ from mushroom_rl.utils.dataset import compute_J, parse_dataset
 from pre_grasp_approaching.tasks.grasp_decision import GraspDecision
 
 
-def experiment(cfg):
+def experiment(cfg, alg):
     np.random.seed()
 
     # MDP
-    mdp = GraspDecision(cfg)
+    mdp = GraspDecision(cfg.task)
 
     # Info
     print("MDP observation space low:", mdp.info.observation_space.low)
@@ -54,7 +54,7 @@ def experiment(cfg):
 def main(cfg : DictConfig) -> None:
     config = OmegaConf.to_yaml(cfg)
     print(config)
-    experiment(cfg)
+    experiment(cfg, alg=LRL)
 
 
 if __name__ == '__main__':
