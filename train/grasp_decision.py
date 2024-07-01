@@ -52,7 +52,21 @@ def experiment(cfg, alg):
 
     # Approximator
     actor_input_shape = mdp.info.observation_space.shape
+    actor_mu_params = dict(network=ActorNetwork,
+                           n_features=n_features,
+                           input_shape=actor_input_shape,
+                           output_shape=mdp.info.action_space.shape,
+                           use_cuda=use_cuda)
+    actor_sigma_params = dict(network=ActorNetwork,
+                              n_features=n_features,
+                              input_shape=actor_input_shape,
+                              output_shape=mdp.info.action_space.shape,
+                              use_cuda=use_cuda)
+
+
     action_space_continous = mdp.info.action_space.shape
+    action_space_discrete = (2,)       
+
     actor_discrete_input_shape = (mdp.info.observation_space.shape[0] + action_space_continous[0],) 
 
     actor_discrete_params = dict(network=ActorNetwork,
@@ -64,7 +78,7 @@ def experiment(cfg, alg):
     actor_optimizer = {'class': optim.Adam,
                        'params': {'lr': lr_actor}}
 
-    critic_input_shape = (actor_input_shape[0] + mdp.info.action_space.shape[0] + action_space_continous[0],) 
+    critic_input_shape = (actor_input_shape[0] + mdp.info.action_space.shape[0] + action_space_discrete[0],) 
 
     critic_params = dict(network=CriticNetwork,
                          optimizer={'class': optim.Adam,
@@ -80,11 +94,10 @@ def experiment(cfg, alg):
     agent = alg(mdp.info, [2,4], None, None, actor_discrete_params, actor_optimizer, critic_params, batch_size, 
         initial_replay_size, max_replay_size, warmup_transitions, tau, lr_alpha, critic_fit_params=None)
 
+
     agent.setup_prior([base_motion_agent], np.array([[0,14]]), np.array([[0,2]]))
     core = Core(agent, mdp)
 
-    agent = alg(mdp.info, actor_mu_params, actor_sigma_params, actor_optimizer, critic_params, batch_size, 
-            initial_replay_size, max_replay_size, warmup_transitions, tau, lr_alpha, critic_fit_params=None)
     # Algorithm
     core = Core(agent, mdp)
 
@@ -97,7 +110,7 @@ def experiment(cfg, alg):
     J_mean = np.mean(compute_J(dataset, mdp.info.gamma))
     R_mean = np.mean(compute_J(dataset))
 
-    E = agent.policy.entropy(s)
+    E = agent.policy.entropy(np.hstack((s,a[:,0:2])))
 
     logger.epoch_info(0, J=J_mean, R=R_mean, entropy=E)
 
@@ -121,13 +134,13 @@ def experiment(cfg, alg):
         R_mean = np.mean(compute_J(dataset))
         R_var = np.var(compute_J(dataset))
 
-        E = agent.policy.entropy(s)
+        E = agent.policy.entropy(np.hstack((s,a[:,0:2])))
 
         logger.epoch_info(n+1, J=J_mean, R=R_mean, entropy=E)
 
         save_dir = cfg.task.train.save_dir
         if save_dir:
-            if n % 10  == 0:
+            if n % 1  == 0:
                 agent.save('{}/grasp_decision_epoch_{}.msh'.format(save_dir, n), full_save=True)
             
             J_mean_logs[n] = J_mean
