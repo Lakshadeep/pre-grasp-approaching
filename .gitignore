@@ -15,3 +15,5 @@ pre-grasp-approaching.egg-info/
 *.launch
 *.xacro
 *.egg-info
+ur5e_assets
+isaac_envs

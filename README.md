@@ -27,6 +27,20 @@ omegaconf, hydra, hydra-core, tqdm, opencv-python,  mushroom-rl (local), shapely
 ./python.sh -m pip install -e {package path}/  --global-option=build_ext --global-option=build_ext  --global-option="-I{Isaac install pathj}/ov/pkg/isaac_sim-2022.2.0/kit/python/include/python3.7m"
 ```
 
+#### Downloading assets
+In case you have errors with assets, complete asset folders can be downloaded from the below links
+
+Isaac environments
+```
+https://drive.google.com/file/d/1LU8-O9ryiOb-zTFRssUWy8UmM0cG0OJn/view?usp=drive_link
+```
+UR5e assets
+```
+https://drive.google.com/file/d/1eF6715RksMnvrKd-bVuD326S4U-jGs-J/view?usp=drive_link
+```
+Download both the files, unzip and place them inside the repository
+
+
 ## NOTES:
 - Before trying to run the code, please change relative paths in all the config files in 'conf' folder.
 
